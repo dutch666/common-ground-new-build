@@ -1,0 +1,44 @@
+image:
+  file: .gitpod.Dockerfile
+
+tasks:
+  - name: Setup Cosmos SDK Environment
+    init: |
+      echo "Updating package lists..."
+      sudo apt-get update
+      echo "Installing required packages: gcc, make..."
+      sudo apt-get install -y gcc make
+      echo "Verifying Go installation..."
+      go version
+      echo "Cloning Cosmos SDK repository..."
+      git clone https://github.com/cosmos/cosmos-sdk.git $GOPATH/src/github.com/cosmos/cosmos-sdk
+      cd $GOPATH/src/github.com/cosmos/cosmos-sdk
+      echo "Building and installing Cosmos SDK..."
+      make install
+      echo "Cosmos SDK installed. Checking binaries in $GOPATH/bin..."
+      ls -l $GOPATH/bin
+      echo "Setting up sample module environment for Karmacoin..."
+      mkdir -p $GOPATH/src/github.com/yourusername/karmacoin
+      cd $GOPATH/src/github.com/yourusername/karmacoin
+      go mod init github.com/yourusername/karmacoin
+      echo "Creating sample main.go file..."
+      cat <<EOF > main.go
+      package main
+
+      import (
+          "fmt"
+          "github.com/cosmos/cosmos-sdk/types"
+      )
+
+      func main() {
+          fmt.Println("Hello, Cosmos! Version:", types.Version)
+      }
+EOF
+      echo "Running sample module..."
+      go run main.go
+    command: |
+      echo "Gitpod workspace for Cosmos SDK is ready."
+      
+ports:
+  - port: 3000
+    onOpen: ignore
